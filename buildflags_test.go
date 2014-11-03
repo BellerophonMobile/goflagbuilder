@@ -11,54 +11,100 @@ type expectation struct {
 }
 
 type testflags struct {
-	expectations map[string]*expectation
+	label string
+	id int
 
-	errors []string
+	data interface{}
+
+	expectedVars map[string]*expectation
+	expectedError string
+
+	faults []string
 }
 
-func newtestflags() *testflags {
-	fmt.Println("New test")
+var testcount int = 0
+
+func newtest(label string, data interface{}) *testflags {
+
+	testcount++
+
 	x := &testflags{}
-	x.expectations = make(map[string]*expectation)
-	x.errors = make([]string, 0)
+
+	x.label = label
+	x.id = testcount
+
+	x.data = data
+
+	x.expectedVars = make(map[string]*expectation)
+	x.faults = make([]string, 0)
+
+	fmt.Printf("Test %d: %s\n", x.id, x.label)
+
 	return x
 }
 
-func (x *testflags) expect(name string) {
-	x.expectations[name] = &expectation{}
+func (x *testflags) variable(name string) {
+	x.expectedVars[name] = &expectation{}
 }
 
-func (x *testflags) check(t *testing.T) {
+func (x *testflags) error(error string) {
+	x.expectedError = error
+}
+
+func (x *testflags) check(err error, t *testing.T) {
 
 	var res string
 
-	for k, v := range x.expectations {
+	if err == nil {
+		if x.expectedError != "" {
+			res += "    Did not get expected error:\n  " + x.expectedError + "\n"
+		}
+	} else {
+		str := err.Error()
+
+		if x.expectedError == "" {
+			res += "    Did not expect error:\n  " + str + "\n"
+		} else if x.expectedError != str {
+			res += "    Expected error did not match received:\n  " + x.expectedError + "\n  " + str + "\n"
+		}
+
+	}
+
+	for k, v := range x.expectedVars {
 		if !v.found {
-			res += "Expectation " + k + " was not found\n"
+			res += "    Expected variable " + k + " was not found\n"
 		}
 	}
 
-	for _, s := range x.errors {
-		res += s
+	for _, s := range x.faults {
+		res += "    " + s + "\n"
 	}
 
 	if res != "" {
-		t.Error("Failed expectations:\n" + res)
+		t.Error(fmt.Sprintf("Failed test %d: %s\n  Data: %v\n  Faults:\n%s", x.id, x.label, x.data, res))
 	}
+
+}
+
+func (x *testflags) run(t *testing.T) {
+
+	_, err := Into(x, x.data)
+	x.check(err, t)
 
 }
 
 func (x *testflags) Var(value flag.Value, name string, usage string) {
 	fmt.Printf("  Add flag %s %v --- \"%v\"\n", name, value, usage)
 
-	exp, ok := x.expectations[name]
+	exp, ok := x.expectedVars[name]
 	if !ok {
-		x.errors = append(x.errors, "Unexpected variable '"+name+"'\n")
+		x.faults = append(x.faults, "Unexpected variable '"+name+"'")
 	} else {
 		exp.found = true
 	}
 
 }
+
 
 type mystruct struct {
 	FieldA string
@@ -86,138 +132,86 @@ type mystruct3 struct {
 
 func Test_From_Invalid(t *testing.T) {
 
-	var flags *testflags
+	var test *testflags
 
-	flags = newtestflags()
-	_, err := Into(flags, nil)
-	if err == nil {
-		t.Error("No error thrown on nil")
-	} else if err.Error() != "Cannot build flags from nil" {
-		t.Error("Incorrect error thrown on nil: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Nil", nil)
+	test.error("Cannot build flags from nil")
+	test.run(t)
 
-	flags = newtestflags()
-	_, err = Into(flags, "Banana")
-	if err == nil {
-		t.Error("No error thrown on string")
-	} else if err.Error() != "Cannot build flags from type string for prefix ''" {
-		t.Error("Incorrect error thrown on string: " + err.Error())
-	}
-	flags.check(t)
 
-	flags = newtestflags()
-	_, err = Into(flags, 7)
-	if err == nil {
-		t.Error("No error thrown on int")
-	} else if err.Error() != "Cannot build flags from type int for prefix ''" {
-		t.Error("Incorrect error thrown on int: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("String", "Banana")
+	test.error("Cannot build flags from type string for prefix ''")
+	test.run(t)
 
-	flags = newtestflags()
-	_, err = Into(flags, 7.0)
-	if err == nil {
-		t.Error("No error thrown on float")
-	} else if err.Error() != "Cannot build flags from type float64 for prefix ''" {
-		t.Error("Incorrect error thrown on float: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Int", 7)
+	test.error("Cannot build flags from type int for prefix ''")
+	test.run(t)
 
-	flags = newtestflags()
-	_, err = Into(flags, mystruct{"Banana", 7})
-	if err == nil {
-		t.Error("No error thrown on struct")
-	} else if err.Error() != "Value of type string at FieldA cannot be set" {
-		t.Error("Incorrect error thrown on struct: " + err.Error())
-	}
-	flags.check(t)
 
-	flags = newtestflags()
-	_, err = Into(flags, map[string]interface{}{"MyStruct": mystruct{}})
-	if err == nil {
-		t.Error("No error thrown on map to value struct")
-	} else if err.Error() != "Value of type string at MyStruct.FieldA cannot be set" {
-		t.Error("Incorrectly thrown error on map to value struct: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Float", 7.0)
+	test.error("Cannot build flags from type float64 for prefix ''")
+	test.run(t)
 
-	flags = newtestflags()
-	flags.expect("Name")
-	flags.expect("Index")
-	_, err = Into(flags, &mystruct3{})
-	if err == nil {
-		t.Error("No error thrown on nil nested struct")
-	} else if err.Error() != "Cannot build flags from nil pointer for prefix 'Location'" {
-		t.Error("Incorrectly thrown error on nil nested struct: " + err.Error())
-	}
-	flags.check(t)
+
+	test = newtest("Struct", mystruct{"Banana", 7})
+	test.error("Value of type string at FieldA cannot be set")
+	test.run(t)
+
+
+	test = newtest("Map to Struct",
+		map[string]interface{}{"MyStruct": mystruct{}})
+	test.error("Value of type string at MyStruct.FieldA cannot be set")
+	test.run(t)
+
+	test = newtest("Struct with Nested Nil", &mystruct3{})
+	test.variable("Name")
+	test.variable("Index")
+	test.error("Cannot build flags from nil pointer for prefix 'Location'")
+	test.run(t)
 
 }
 
+
 func Test_From_Map(t *testing.T) {
 
-	var flags *testflags
+	var test *testflags
 
-	flags = newtestflags()
-	_, err := Into(flags, make(map[string]int))
-	if err != nil {
-		t.Error("Incorrectly thrown error on empty map: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Empty map", make(map[string]int))
+	test.run(t)
 
-	flags = newtestflags()
-	flags.expect("Banana")
-	_, err = Into(flags, map[string]int{"Banana": 7})
-	if err != nil {
-		t.Error("Incorrectly thrown error on string->int map: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Map to Int", map[string]int{"Banana": 7})
+	test.variable("Banana")
+	test.run(t)
 
-	flags = newtestflags()
-	flags.expect("MyStruct.FieldA")
-	flags.expect("MyStruct.FieldB")
-	_, err = Into(flags, map[string]interface{}{"MyStruct": &mystruct{}})
-	if err != nil {
-		t.Error("Incorrectly thrown error on string->int map: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Map to Struct Ptr",
+		map[string]interface{}{"MyStruct": &mystruct{}})
+	test.variable("MyStruct.FieldA")
+	test.variable("MyStruct.FieldB")
+	test.run(t)
 
 }
 
 func Test_From_Struct(t *testing.T) {
 
-	var flags *testflags
+	var test *testflags
 
-	flags = newtestflags()
-	flags.expect("FieldA")
-	flags.expect("FieldB")
-	_, err := Into(flags, &mystruct{})
-	if err != nil {
-		t.Error("Incorrectly thrown error on struct: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Struct Ptr", &mystruct{})
+	test.variable("FieldA")
+	test.variable("FieldB")
+	test.run(t)
 
-	flags = newtestflags()
-	flags.expect("Name")
-	flags.expect("Index")
-	flags.expect("Location.Grid")
-	flags.expect("Location.Fraction")
-	_, err = Into(flags, &mystruct2{})
-	if err != nil {
-		t.Error("Incorrectly thrown error on struct: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Nested Struct", &mystruct2{})
+	test.variable("Name")
+	test.variable("Index")
+	test.variable("Location.Grid")
+	test.variable("Location.Fraction")
+	test.run(t)
 
-	flags = newtestflags()
-	flags.expect("Name")
-	flags.expect("Index")
-	flags.expect("Location.Grid")
-	flags.expect("Location.Fraction")
-	_, err = Into(flags, &mystruct3{Location: &myotherstruct{}})
-	if err != nil {
-		t.Error("Incorrectly thrown error on struct: " + err.Error())
-	}
-	flags.check(t)
+	test = newtest("Nested Struct Ptr", &mystruct3{Location: &myotherstruct{}})
+	test.variable("Name")
+	test.variable("Index")
+	test.variable("Location.Grid")
+	test.variable("Location.Fraction")
+	test.run(t)
 
 }
