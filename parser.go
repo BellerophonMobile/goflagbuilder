@@ -34,8 +34,10 @@ func (x *Parser) Parse(in io.Reader) error {
 		str := scanner.Text()
 
 		index := strings.Index(str, "#")
-		if index != -1 && (index == 0 || str[index-1] != '\\') {
-			str = str[:index]
+		if index != -1 {
+			if index == 0 || str[index-1] != '\\' {
+				str = str[:index]
+			}
 		}
 
 		str = strings.TrimSpace(str)
