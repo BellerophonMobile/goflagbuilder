@@ -10,7 +10,8 @@ import (
 	"strings"
 )
 
-//
+// Parser objects are constructed to manipulate specific objects via
+// reading key/value pairs from a document source.
 type Parser struct {
 	flags map[string]flag.Value
 }
