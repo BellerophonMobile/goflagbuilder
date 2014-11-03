@@ -1,7 +1,6 @@
 package gobuildflags
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -19,11 +18,11 @@ func (x *flagvalue) String() string {
 func (x *flagvalue) Set(str string) error {
 
 	if !x.value.IsValid() {
-		return errors.New(fmt.Sprintf("Flag variable value of type %s for %s is invalid", x.value.Type().Name(), x.name))
+		return fmt.Errorf("Flag variable value of type %s for %s is invalid", x.value.Type().Name(), x.name)
 	}
 
 	if !x.value.CanSet() {
-		return errors.New(fmt.Sprintf("Flag variable value of type %s for %s cannot be set", x.value.Type().Name(), x.name))
+		return fmt.Errorf("Flag variable value of type %s for %s cannot be set", x.value.Type().Name(), x.name)
 	}
 
 	switch x.value.Kind() {
@@ -73,7 +72,7 @@ func (x *flagvalue) Set(str string) error {
 		x.value.SetUint(i)
 
 	default:
-		return errors.New(fmt.Sprintf("Unsupported flag field variable type %v kind %v for prefix %s", x.value.Type(), x.value.Kind(), x.name))
+		return fmt.Errorf("Unsupported flag field variable type %v kind %v for prefix %s", x.value.Type(), x.value.Kind(), x.name)
 	}
 
 	return nil

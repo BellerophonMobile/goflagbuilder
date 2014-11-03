@@ -92,7 +92,7 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 			// Potentially get a usage string from a tag?
 
 			if !elementval.CanSet() {
-				return errors.New(fmt.Sprintf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix))
+				return fmt.Errorf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix)
 			}
 
 			set := &flagvalue{subprefix, elementval}
@@ -114,7 +114,7 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 func recursePtrFlags(flags FlagSet, parser *Parser, prefix string, ptrval reflect.Value) error {
 
 	if ptrval.IsNil() {
-		return errors.New(fmt.Sprintf("Cannot build flags from nil pointer for prefix '%s'", prefix))
+		return fmt.Errorf("Cannot build flags from nil pointer for prefix '%s'", prefix)
 	}
 
 	return recurseBuildFlags(flags, parser, prefix, ptrval.Elem())
@@ -136,7 +136,7 @@ func recurseBuildFlags(flags FlagSet, parser *Parser, prefix string, elementval 
 		return recursePtrFlags(flags, parser, prefix, elementval)
 
 	default:
-		return errors.New(fmt.Sprintf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix))
+		return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
 	}
 
 	return nil

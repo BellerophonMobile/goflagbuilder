@@ -28,7 +28,7 @@ type testflags struct {
 	expectedParserError string
 }
 
-var testcount int = 0
+var testcount int
 
 func newtest(t *testing.T, label string, data interface{}) *testflags {
 

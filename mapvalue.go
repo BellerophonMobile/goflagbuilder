@@ -1,7 +1,6 @@
 package gobuildflags
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -67,7 +66,7 @@ func (x *mapvalue) Set(str string) error {
 		x.mapval.SetMapIndex(x.keyval, reflect.ValueOf(i))
 
 	default:
-		return errors.New(fmt.Sprintf("Unsupported type %v kind %v for prefix %s", x.elementval.Type(), x.elementval.Kind(), x.name))
+		return fmt.Errorf("Unsupported type %v kind %v for prefix %s", x.elementval.Type(), x.elementval.Kind(), x.name)
 	}
 
 	return nil

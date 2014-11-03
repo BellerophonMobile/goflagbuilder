@@ -2,7 +2,6 @@ package gobuildflags
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -51,7 +50,7 @@ func (x *Parser) Parse(in io.Reader) error {
 
 		index = strings.Index(str, "=")
 		if index < 0 {
-			return errors.New(fmt.Sprintf("Line %d has no key", line))
+			return fmt.Errorf("Line %d has no key", line)
 		}
 
 		key := strings.TrimSpace(str[:index])
@@ -59,7 +58,7 @@ func (x *Parser) Parse(in io.Reader) error {
 
 		flag, ok := x.flags[key]
 		if !ok {
-			return errors.New(fmt.Sprintf("Unknown key '%s' on line %d", key, line))
+			return fmt.Errorf("Unknown key '%s' on line %d", key, line)
 		}
 		if err := flag.Set(value); err != nil {
 			return err
@@ -86,9 +85,8 @@ func (x *Parser) ParseFile(filename string) error {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
-		} else {
-			return err
 		}
+		return err
 	}
 	defer in.Close()
 
