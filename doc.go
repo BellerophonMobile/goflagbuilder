@@ -1,4 +1,4 @@
-/**
+/*
 
 Package gobuildflags constructs command line flags and a file parser
 to manipulate a given structure.  It uses reflection to traverse a
