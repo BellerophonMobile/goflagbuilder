@@ -40,6 +40,8 @@ func Example_Simple() {
 }
 ```
 
+This would establish the command line flags "-Port" and "-Domain".
+
 A more elaborate example including nested structures and using the
 parser is available
 [here](https://github.com/BellerophonMobile/gobuildflags/blob/master/doc_extended_test.go).
