@@ -76,12 +76,18 @@ func (x *Parser) Parse(in io.Reader) error {
 
 // ParseFile reads the file indicated by filename line by line and
 // parses key/value pairs to manipulate the associated object.  It is
-// identical to calling Parse on a File opened from filename.
+// identical to calling Parse on a File opened from filename.  No
+// error is returned if the file does not exist, on the theory that it
+// is equivalent to a blank file which would set no flags.
 func (x *Parser) ParseFile(filename string) error {
 
 	in, err := os.Open(filename)
 	if err != nil {
-		return err
+		if os.IsNotExist(err) {
+			return nil
+		} else {
+			return err
+		}
 	}
 	defer in.Close()
 
