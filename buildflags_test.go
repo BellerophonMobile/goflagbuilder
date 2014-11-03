@@ -89,7 +89,7 @@ func Test_From_Invalid(t *testing.T) {
 	var flags *testflags
 
 	flags = newtestflags()
-	err := Into(flags, nil)
+	_, err := Into(flags, nil)
 	if err == nil {
 		t.Error("No error thrown on nil")
 	} else if err.Error() != "Cannot build flags from nil" {
@@ -98,7 +98,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags.check(t)
 
 	flags = newtestflags()
-	err = Into(flags, "Banana")
+	_, err = Into(flags, "Banana")
 	if err == nil {
 		t.Error("No error thrown on string")
 	} else if err.Error() != "Cannot build flags from type string for prefix ''" {
@@ -107,7 +107,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags.check(t)
 
 	flags = newtestflags()
-	err = Into(flags, 7)
+	_, err = Into(flags, 7)
 	if err == nil {
 		t.Error("No error thrown on int")
 	} else if err.Error() != "Cannot build flags from type int for prefix ''" {
@@ -116,7 +116,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags.check(t)
 
 	flags = newtestflags()
-	err = Into(flags, 7.0)
+	_, err = Into(flags, 7.0)
 	if err == nil {
 		t.Error("No error thrown on float")
 	} else if err.Error() != "Cannot build flags from type float64 for prefix ''" {
@@ -125,7 +125,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags.check(t)
 
 	flags = newtestflags()
-	err = Into(flags, mystruct{"Banana", 7})
+	_, err = Into(flags, mystruct{"Banana", 7})
 	if err == nil {
 		t.Error("No error thrown on struct")
 	} else if err.Error() != "Value of type string at FieldA cannot be set" {
@@ -134,7 +134,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags.check(t)
 
 	flags = newtestflags()
-	err = Into(flags, map[string]interface{}{"MyStruct": mystruct{}})
+	_, err = Into(flags, map[string]interface{}{"MyStruct": mystruct{}})
 	if err == nil {
 		t.Error("No error thrown on map to value struct")
 	} else if err.Error() != "Value of type string at MyStruct.FieldA cannot be set" {
@@ -145,7 +145,7 @@ func Test_From_Invalid(t *testing.T) {
 	flags = newtestflags()
 	flags.expect("Name")
 	flags.expect("Index")
-	err = Into(flags, &mystruct3{})
+	_, err = Into(flags, &mystruct3{})
 	if err == nil {
 		t.Error("No error thrown on nil nested struct")
 	} else if err.Error() != "Cannot build flags from nil pointer for prefix 'Location'" {
@@ -160,7 +160,7 @@ func Test_From_Map(t *testing.T) {
 	var flags *testflags
 
 	flags = newtestflags()
-	err := Into(flags, make(map[string]int))
+	_, err := Into(flags, make(map[string]int))
 	if err != nil {
 		t.Error("Incorrectly thrown error on empty map: " + err.Error())
 	}
@@ -168,7 +168,7 @@ func Test_From_Map(t *testing.T) {
 
 	flags = newtestflags()
 	flags.expect("Banana")
-	err = Into(flags, map[string]int{"Banana": 7})
+	_, err = Into(flags, map[string]int{"Banana": 7})
 	if err != nil {
 		t.Error("Incorrectly thrown error on string->int map: " + err.Error())
 	}
@@ -177,7 +177,7 @@ func Test_From_Map(t *testing.T) {
 	flags = newtestflags()
 	flags.expect("MyStruct.FieldA")
 	flags.expect("MyStruct.FieldB")
-	err = Into(flags, map[string]interface{}{"MyStruct": &mystruct{}})
+	_, err = Into(flags, map[string]interface{}{"MyStruct": &mystruct{}})
 	if err != nil {
 		t.Error("Incorrectly thrown error on string->int map: " + err.Error())
 	}
@@ -192,7 +192,7 @@ func Test_From_Struct(t *testing.T) {
 	flags = newtestflags()
 	flags.expect("FieldA")
 	flags.expect("FieldB")
-	err := Into(flags, &mystruct{})
+	_, err := Into(flags, &mystruct{})
 	if err != nil {
 		t.Error("Incorrectly thrown error on struct: " + err.Error())
 	}
@@ -203,7 +203,7 @@ func Test_From_Struct(t *testing.T) {
 	flags.expect("Index")
 	flags.expect("Location.Grid")
 	flags.expect("Location.Fraction")
-	err = Into(flags, &mystruct2{})
+	_, err = Into(flags, &mystruct2{})
 	if err != nil {
 		t.Error("Incorrectly thrown error on struct: " + err.Error())
 	}
@@ -214,7 +214,7 @@ func Test_From_Struct(t *testing.T) {
 	flags.expect("Index")
 	flags.expect("Location.Grid")
 	flags.expect("Location.Fraction")
-	err = Into(flags, &mystruct3{Location: &myotherstruct{}})
+	_, err = Into(flags, &mystruct3{Location: &myotherstruct{}})
 	if err != nil {
 		t.Error("Incorrectly thrown error on struct: " + err.Error())
 	}
