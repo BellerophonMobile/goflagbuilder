@@ -12,11 +12,11 @@ type expectation struct {
 
 type testflags struct {
 	label string
-	id int
+	id    int
 
 	data interface{}
 
-	expectedVars map[string]*expectation
+	expectedVars  map[string]*expectation
 	expectedError string
 
 	faults []string
@@ -105,7 +105,6 @@ func (x *testflags) Var(value flag.Value, name string, usage string) {
 
 }
 
-
 type mystruct struct {
 	FieldA string
 	FieldB int
@@ -138,7 +137,6 @@ func Test_From_Invalid(t *testing.T) {
 	test.error("Cannot build flags from nil")
 	test.run(t)
 
-
 	test = newtest("String", "Banana")
 	test.error("Cannot build flags from type string for prefix ''")
 	test.run(t)
@@ -147,16 +145,13 @@ func Test_From_Invalid(t *testing.T) {
 	test.error("Cannot build flags from type int for prefix ''")
 	test.run(t)
 
-
 	test = newtest("Float", 7.0)
 	test.error("Cannot build flags from type float64 for prefix ''")
 	test.run(t)
 
-
 	test = newtest("Struct", mystruct{"Banana", 7})
 	test.error("Value of type string at FieldA cannot be set")
 	test.run(t)
-
 
 	test = newtest("Map to Struct",
 		map[string]interface{}{"MyStruct": mystruct{}})
@@ -170,7 +165,6 @@ func Test_From_Invalid(t *testing.T) {
 	test.run(t)
 
 }
-
 
 func Test_From_Map(t *testing.T) {
 
