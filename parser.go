@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+//
 type Parser struct {
 	flags map[string]flag.Value
 }
@@ -24,6 +25,8 @@ func (x *Parser) add(flag string, set flag.Value) {
 	x.flags[flag] = set
 }
 
+// Parse reads the given Reader line by line and parses key/value
+// pairs to manipulate the associated object.
 func (x *Parser) Parse(in io.Reader) error {
 
 	var line int
@@ -53,8 +56,6 @@ func (x *Parser) Parse(in io.Reader) error {
 		key := strings.TrimSpace(str[:index])
 		value := strings.TrimSpace(str[index+1:])
 
-		fmt.Printf("%s -> %s\n", key, value)
-
 		flag, ok := x.flags[key]
 		if !ok {
 			return errors.New(fmt.Sprintf("Unknown key '%s' on line %d", key, line))
@@ -73,6 +74,9 @@ func (x *Parser) Parse(in io.Reader) error {
 
 }
 
+// ParseFile reads the file indicated by filename line by line and
+// parses key/value pairs to manipulate the associated object.  It is
+// identical to calling Parse on a File opened from filename.
 func (x *Parser) ParseFile(filename string) error {
 
 	in, err := os.Open(filename)

@@ -144,7 +144,8 @@ func recurseBuildFlags(flags FlagSet, parser *Parser, prefix string, elementval 
 }
 
 // Into populates the given flag set with hierarchical fields from the
-// given object.
+// given object.  It returns a Parser that may be used to read those
+// same flags from a configuration file.
 func Into(flags FlagSet, configuration interface{}) (*Parser, error) {
 
 	if configuration == nil {
@@ -164,7 +165,8 @@ func Into(flags FlagSet, configuration interface{}) (*Parser, error) {
 
 // From populates the top-level default flags with hierarchical fields
 // from the given object.  It simply calls Into() with configuration
-// on a facade of the top-level flag package functions.
+// on a facade of the top-level flag package functions, and returns
+// the resultant Parser or error.
 func From(configuration interface{}) (*Parser, error) {
 	return Into(toplevelflags, configuration)
 }
