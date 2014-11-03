@@ -3,8 +3,8 @@
 Package gobuildflags constructs command line flags and a file parser
 to manipulate a given structure.  It uses reflection to traverse a
 potentially hierarchical object of structs and maps and install
-handlers in Go's standard flag package.  Constructed parsers simply
-scan given documents line by line and apply any key/value pairs found.
+handlers in Go's standard flag package.  Constructed parsers scan
+given documents line by line and apply any key/value pairs found.
 
 Constructed flags have the form Foo=..., Bar=...,Obj.Field=... and so
 on.  Maps and exposed fields of structs with primitive types are
