@@ -1,4 +1,4 @@
-package gobuildflags
+package goflagbuilder
 
 import (
 	"testing"

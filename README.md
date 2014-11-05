@@ -1,11 +1,11 @@
-gobuildflags
+GoFlagBuilder
 ============
 
-Package gobuildflags constructs command line flags and a file parser
-to manipulate a given structure.  It uses reflection to traverse a
-potentially hierarchical object of structs and maps and install
-handlers in Go's standard flag package.  Constructed parsers simply
-scan given documents line by line and apply any key/value pairs found.
+GoFlagBuilder provides simple tools to construct command line flags
+and a file parser to manipulate a given structure.  It uses reflection
+to traverse a potentially hierarchical object of structs and maps and
+install handlers in Go's standard flag package.  Constructed parsers
+scan given documents line by line and apply key/value pairs found.
 
 Constructed flags have the form Foo=..., Bar=...,Obj.Field=... and so
 on.  Maps and exposed fields of structs with primitive types are
@@ -13,14 +13,14 @@ consumed, so in this case Foo and Bar might be map keys or public
 struct fields to a primitive.  Nested maps and structs are followed,
 producing dot-notation hierarchical keys such as Obj.Field.
 
-Primitive types understood by gobuildflags include bool, float64,
+Primitive types understood by GoFlagBuilder include bool, float64,
 int64, int, string, uint64, and uint.
 
 Primitive fields in the given object and sub-objects must be settable.
 In general this means structs should be passed in as pointers.  Maps
 may also be set directly.
 
-[![Build Status](https://travis-ci.org/BellerophonMobile/gobuildflags.svg)](https://travis-ci.org/BellerophonMobile/gobuildflags) [![GoDoc](https://godoc.org/github.com/BellerophonMobile/gobuildflags?status.svg)](https://godoc.org/github.com/BellerophonMobile/gobuildflags)
+[![Build Status](https://travis-ci.org/BellerophonMobile/goflagbuilder.svg)](https://travis-ci.org/BellerophonMobile/goflagbuilder) [![GoDoc](https://godoc.org/github.com/BellerophonMobile/goflagbuilder?status.svg)](https://godoc.org/github.com/BellerophonMobile/goflagbuilder)
 
 ## Example
 
@@ -31,7 +31,7 @@ package main
 
 import (
 	"flag"
-  "gobuildflags"
+  "goflagbuilder"
 	"log"
 )
 
@@ -60,7 +60,7 @@ This would establish the command line flags "-Port" and "-Domain".
 
 A more elaborate example including nested structures and using the
 parser is available
-[here](https://github.com/BellerophonMobile/gobuildflags/blob/master/doc_extended_test.go).
+[here](https://github.com/BellerophonMobile/goflagbuilder/blob/master/doc_extended_test.go).
 There are also a series of tests in the package outlining exactly what
 input structures are valid.
 
@@ -68,12 +68,12 @@ input structures are valid.
 ## Major Release Changelog
 
  * **2014/11/03: Release 1.0!** Though not mature at all, we consider
-   gobuildflags to be usable.
+   GoFlagBuilder to be usable.
 
 
 ## License
 
-gobuildflags is provided under the open source
+GoFlagBuilder is provided under the open source
 [MIT license](http://opensource.org/licenses/MIT):
 
 > The MIT License (MIT)
