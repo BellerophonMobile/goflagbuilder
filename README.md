@@ -60,9 +60,8 @@ This would establish the command line flags "-Port" and "-Domain".
 
 A more elaborate example including nested structures and using the
 parser is available
-[here](https://github.com/BellerophonMobile/goflagbuilder/blob/master/doc_extended_test.go).
-There are also a series of tests in the package outlining exactly what
-input structures are valid.
+[here](https://github.com/BellerophonMobile/goflagbuilder/blob/master/doc_extended_test.go). There are also a series of tests in the package outlining
+exactly what input structures are valid.
 
 
 ## Major Release Changelog
