@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+var Strict = false
+
 func populateMapFlags(flags FlagSet, parser *Parser, prefix string, mapval reflect.Value) error {
 
 	if prefix != "" {
@@ -92,7 +94,11 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 			// Potentially get a usage string from a tag?
 
 			if !elementval.CanSet() {
-				return fmt.Errorf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix)
+				if Strict {
+					return fmt.Errorf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix)
+				} else {
+					continue
+				}
 			}
 
 			set := &flagvalue{subprefix, elementval}
@@ -114,7 +120,11 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 func recursePtrFlags(flags FlagSet, parser *Parser, prefix string, ptrval reflect.Value) error {
 
 	if ptrval.IsNil() {
-		return fmt.Errorf("Cannot build flags from nil pointer for prefix '%s'", prefix)
+		if Strict {
+			return fmt.Errorf("Cannot build flags from nil pointer for prefix '%s'", prefix)
+		} else {
+			return nil
+		}
 	}
 
 	return recurseBuildFlags(flags, parser, prefix, ptrval.Elem())
@@ -136,7 +146,11 @@ func recurseBuildFlags(flags FlagSet, parser *Parser, prefix string, elementval 
 		return recursePtrFlags(flags, parser, prefix, elementval)
 
 	default:
-		return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
+		if Strict {
+			return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
+		} else {
+			return nil
+		}
 	}
 
 	return nil

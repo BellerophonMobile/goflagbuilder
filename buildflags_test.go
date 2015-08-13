@@ -29,7 +29,7 @@ type mystruct3 struct {
 }
 
 func Test_From_Invalid(t *testing.T) {
-
+	
 	var test *testflags
 
 	test = newtest(t, "Nil", nil)
@@ -39,6 +39,9 @@ func Test_From_Invalid(t *testing.T) {
 	test = newtest(t, "String", "Banana")
 	test.error("Cannot build flags from type string for prefix ''")
 	test.run()
+
+	test = newtest(t, "String (not strict)", "Banana")
+	test.execute(false)
 
 	test = newtest(t, "Int", 7)
 	test.error("Cannot build flags from type int for prefix ''")
@@ -51,6 +54,9 @@ func Test_From_Invalid(t *testing.T) {
 	test = newtest(t, "Struct", mystruct{"Banana", 7})
 	test.error("Value of type string at FieldA cannot be set")
 	test.run()
+
+	test = newtest(t, "Struct (not strict)", mystruct{"Banana", 7})
+	test.execute(false)
 
 	test = newtest(t, "Map to Struct",
 		map[string]interface{}{"MyStruct": mystruct{}})

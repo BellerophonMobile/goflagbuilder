@@ -107,7 +107,12 @@ func (x *testflags) check(err error) {
 }
 
 func (x *testflags) run() {
+	x.execute(true)
+}
 
+func (x *testflags) execute(strict bool) {
+
+	Strict = strict
 	var err error
 	x.parser, err = Into(x, x.data)
 	x.check(err)
