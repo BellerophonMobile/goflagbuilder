@@ -68,8 +68,9 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 	structtype := structval.Type()
 	for i := 0; i < structval.NumField(); i++ {
 
-		subprefix := prefix + structtype.Field(i).Name
+		field := structtype.Field(i)
 		elementval := structval.Field(i)
+		subprefix := prefix + field.Name
 
 		switch elementval.Kind() {
 		case reflect.Bool:
@@ -91,8 +92,6 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 			fallthrough
 
 		case reflect.Uint:
-			// Potentially get a usage string from a tag?
-
 			if !elementval.CanSet() {
 				if Strict {
 					return fmt.Errorf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix)
@@ -102,7 +101,7 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 			}
 
 			set := &flagvalue{subprefix, elementval}
-			flags.Var(set, subprefix, "")
+			flags.Var(set, subprefix, field.Tag.Get("help"))
 			parser.add(subprefix, set)
 
 		default:
