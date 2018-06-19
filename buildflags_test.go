@@ -29,7 +29,7 @@ type mystruct3 struct {
 }
 
 func Test_From_Invalid(t *testing.T) {
-	
+
 	var test *testflags
 
 	test = newtest(t, "Nil", nil)
