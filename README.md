@@ -20,7 +20,9 @@ Primitive fields in the given object and sub-objects must be settable.
 In general this means structs should be passed in as pointers.  Maps
 may also be set directly.
 
-[![Build Status](https://travis-ci.org/BellerophonMobile/goflagbuilder.svg)](https://travis-ci.org/BellerophonMobile/goflagbuilder) [![GoDoc](https://godoc.org/github.com/BellerophonMobile/goflagbuilder?status.svg)](https://godoc.org/github.com/BellerophonMobile/goflagbuilder)
+[![Build Status](https://travis-ci.org/BellerophonMobile/goflagbuilder.svg?branch=master)](https://travis-ci.org/BellerophonMobile/goflagbuilder)
+[![GoDoc](https://godoc.org/github.com/BellerophonMobile/goflagbuilder?status.svg)](https://godoc.org/github.com/BellerophonMobile/goflagbuilder)
+[![Go Report Card](https://goreportcard.com/badge/github.com/BellerophonMobile/goflagbuilder)](https://goreportcard.com/report/github.com/BellerophonMobile/goflagbuilder)
 
 ## Example
 
