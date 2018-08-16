@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/BellerophonMobile/goflagbuilder/conf"
-	"github.com/BellerophonMobile/goflagbuilder/env"
+	"github.com/BellerophonMobile/goflagbuilder/v2/conf"
+	"github.com/BellerophonMobile/goflagbuilder/v2/env"
 )
 
 type foocomponent struct {

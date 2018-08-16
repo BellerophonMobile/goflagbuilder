@@ -35,7 +35,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/BellerophonMobile/goflagbuilder"
+	"github.com/BellerophonMobile/goflagbuilder/v2"
 )
 
 type server struct {
