@@ -31,8 +31,9 @@ package main
 
 import (
 	"flag"
-  "goflagbuilder"
 	"log"
+
+	"github.com/BellerophonMobile/goflagbuilder"
 )
 
 type server struct {
@@ -45,8 +46,7 @@ func Example_Simple() {
 	myserver := &server{}
 
 	// Construct the flags
-	_, err := From(myserver)
-	if err != nil {
+	if err := From(myserver); err != nil {
 		log.Fatal("Error: " + err.Error())
 	}
 
@@ -58,17 +58,20 @@ func Example_Simple() {
 
 This would establish the command line flags "-Port" and "-Domain".
 
-A more elaborate example including nested structures and using the
-parser is available
-[here](https://github.com/BellerophonMobile/goflagbuilder/blob/master/doc_extended_test.go). There are also a series of tests in the package outlining
-exactly what input structures are valid.
+A more elaborate example including nested structures and using the parser is
+available
+[here](https://github.com/BellerophonMobile/goflagbuilder/blob/master/doc_extended_test.go).
+There are also a series of tests in the package outlining exactly what input
+structures are valid.
 
 
 ## Major Release Changelog
 
+ * **2018/08/16: Release 2.0!** Simplified package a bit, split config file
+   parsing to its own sub-package. Added a new sub-package to read
+   environment variables.
  * **2014/11/03: Release 1.0!** Though not mature at all, we consider
    GoFlagBuilder to be usable.
-
 
 ## License
 
@@ -77,8 +80,8 @@ GoFlagBuilder is provided under the open source
 
 > The MIT License (MIT)
 >
-> Copyright (c) 2014 [Bellerophon Mobile](http://bellerophonmobile.com/)
-> 
+> Copyright (c) 2018 [Bellerophon Mobile](http://bellerophonmobile.com/)
+>
 >
 > Permission is hereby granted, free of charge, to any person
 > obtaining a copy of this software and associated documentation files
