@@ -1,2 +1,6 @@
 language: go
-go: tip
+go: "1.11rc1"
+install: true
+script:
+  - export GO111MODULE=on
+  - go test ./...
