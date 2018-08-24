@@ -19,5 +19,8 @@ Primitive fields in the given object and sub-objects must be settable.
 In general this means structs should be passed in as pointers.  Maps
 may also be set directly.
 
+Struct fields may have a "help" struct tag, which will set the usage
+string for the corresponding flag.
+
 */
 package goflagbuilder

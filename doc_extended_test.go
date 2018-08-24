@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/BellerophonMobile/goflagbuilder/v2/conf"
+	"github.com/BellerophonMobile/goflagbuilder/v2/env"
 )
 
 type foocomponent struct {
@@ -21,7 +24,7 @@ type barcomponent struct {
 	Nested *nestedstruct
 }
 
-func Example_Extended() {
+func Example_extended() {
 
 	// Create some sample data
 	masterconf := make(map[string]interface{})
@@ -38,18 +41,24 @@ func Example_Extended() {
 		},
 	}
 
-	// Construct the flags and parser
-	parser, err := From(masterconf)
-	if err != nil {
-		log.Fatal("CONSTRUCTION ERROR: " + err.Error())
+	// Construct the flags
+	if err := From(masterconf); err != nil {
+		log.Fatal("CONSTRUCTION ERROR:", err)
 	}
 
 	// Read from a config file
-	err = parser.Parse(strings.NewReader(`# Comment
-                                        Foo.Port = 1234
-                                        Bar.Nested.Index=7.9 # SuccesS!`))
-	if err != nil {
-		log.Fatal("Error: " + err.Error())
+	reader := strings.NewReader(`
+		# Comment
+		Foo.Port = 1234
+		Bar.Nested.Index=7.9 # SuccesS!
+	`)
+	if err := conf.Parse(reader, nil); err != nil {
+		log.Fatal("Error:", err)
+	}
+
+	// Override settings from the environment
+	if err := env.Parse(nil); err != nil {
+		log.Fatal("Error:", err)
 	}
 
 	// Override settings from the command line

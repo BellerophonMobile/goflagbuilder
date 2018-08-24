@@ -10,13 +10,12 @@ type server struct {
 	Port   int
 }
 
-func Example_Simple() {
+func Example_simple() {
 
 	myserver := &server{}
 
 	// Construct the flags
-	_, err := From(myserver)
-	if err != nil {
+	if err := From(myserver); err != nil {
 		log.Fatal("Error: " + err.Error())
 	}
 

@@ -2,57 +2,46 @@ package goflagbuilder
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"reflect"
 )
 
-var Strict = false
-
-func populateMapFlags(flags FlagSet, parser *Parser, prefix string, mapval reflect.Value) error {
+func populateMapFlags(flags FlagSet, prefix string, mapval reflect.Value) error {
 	if prefix != "" {
 		prefix += "."
 	}
 
 	for _, keyval := range mapval.MapKeys() {
+		if keyval.Kind() != reflect.String {
+			return fmt.Errorf("Map key must be string, got %s for prefix '%s'", keyval.Type(), prefix)
+		}
+
 		subprefix := prefix + keyval.String()
 		elementval := mapval.MapIndex(keyval)
 
-		switch elementval.Kind() {
-		case reflect.Bool:
-			fallthrough
+		mapKind := mapKind{
+			keyval:    keyval,
+			valueKind: findKind(elementval),
+		}
 
-		case reflect.Float64:
-			fallthrough
-
-		case reflect.Int64:
-			fallthrough
-
-		case reflect.Int:
-			fallthrough
-
-		case reflect.String:
-			fallthrough
-
-		case reflect.Uint64:
-			fallthrough
-
-		case reflect.Uint:
-			set := &mapvalue{subprefix, mapval, keyval, elementval}
-			flags.Var(set, subprefix, "")
-			parser.add(subprefix, set)
-
-		default:
-			err := recurseBuildFlags(flags, parser, subprefix, elementval)
-			if err != nil {
-				return err
+		if mapKind.valueKind != nil {
+			value := value{
+				value:  mapval,
+				kind:   mapKind,
+				isBool: elementval.Kind() == reflect.Bool,
 			}
+			flags.Var(value, subprefix, "")
+
+		} else if err := recurseBuildFlags(flags, subprefix, elementval); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval reflect.Value) error {
+func populateStructFlags(flags FlagSet, prefix string, structval reflect.Value) error {
 	if prefix != "" {
 		prefix += "."
 	}
@@ -62,108 +51,76 @@ func populateStructFlags(flags FlagSet, parser *Parser, prefix string, structval
 		field := structtype.Field(i)
 		elementval := structval.Field(i)
 		subprefix := prefix + field.Name
+		help := field.Tag.Get("help")
 
-		kind := elementval.Kind()
-		if kind == reflect.Slice {
-			kind = elementval.Type().Elem().Kind()
+		value := value{
+			value:  elementval,
+			kind:   findKind(elementval),
+			isBool: elementval.Kind() == reflect.Bool,
 		}
 
-		switch kind {
-		case reflect.Bool:
-			fallthrough
-
-		case reflect.Float64:
-			fallthrough
-
-		case reflect.Int64:
-			fallthrough
-
-		case reflect.Int:
-			fallthrough
-
-		case reflect.String:
-			fallthrough
-
-		case reflect.Uint64:
-			fallthrough
-
-		case reflect.Uint:
+		if value.kind != nil {
 			if !elementval.CanSet() {
-				if Strict {
-					return fmt.Errorf("Value of type %s at %s cannot be set", elementval.Type().Name(), subprefix)
-				}
-				continue
+				return fmt.Errorf("Value of type %s at %s cannot be set", field.Type.String(), subprefix)
 			}
+			flags.Var(value, subprefix, help)
 
-			set := &flagvalue{subprefix, elementval}
-			flags.Var(set, subprefix, field.Tag.Get("help"))
-			parser.add(subprefix, set)
-
-		default:
-			err := recurseBuildFlags(flags, parser, subprefix, elementval)
-			if err != nil {
-				return err
-			}
+		} else if err := recurseBuildFlags(flags, subprefix, elementval); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-func recursePtrFlags(flags FlagSet, parser *Parser, prefix string, ptrval reflect.Value) error {
+func recursePtrFlags(flags FlagSet, prefix string, ptrval reflect.Value) error {
 	if ptrval.IsNil() {
-		if Strict {
+		if ptrval.CanSet() {
+			ptrval.Set(reflect.New(ptrval.Type().Elem()))
+		} else {
 			return fmt.Errorf("Cannot build flags from nil pointer for prefix '%s'", prefix)
 		}
-		return nil
 	}
 
-	return recurseBuildFlags(flags, parser, prefix, ptrval.Elem())
+	return recurseBuildFlags(flags, prefix, ptrval.Elem())
 }
 
-func recurseBuildFlags(flags FlagSet, parser *Parser, prefix string, elementval reflect.Value) error {
+func recurseBuildFlags(flags FlagSet, prefix string, elementval reflect.Value) error {
 	switch elementval.Kind() {
 	case reflect.Map:
-		return populateMapFlags(flags, parser, prefix, elementval)
+		return populateMapFlags(flags, prefix, elementval)
 
 	case reflect.Struct:
-		return populateStructFlags(flags, parser, prefix, elementval)
+		return populateStructFlags(flags, prefix, elementval)
 
-	case reflect.Interface:
-		fallthrough
-	case reflect.Ptr:
-		return recursePtrFlags(flags, parser, prefix, elementval)
+	case reflect.Interface, reflect.Ptr:
+		return recursePtrFlags(flags, prefix, elementval)
 
 	default:
-		if Strict {
-			return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
-		}
-		return nil
+		return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
 	}
 }
 
 // Into populates the given flag set with hierarchical fields from the
 // given object.  It returns a Parser that may be used to read those
 // same flags from a configuration file.
-func Into(flags FlagSet, configuration interface{}) (*Parser, error) {
+func Into(flags FlagSet, configuration interface{}) error {
 	if configuration == nil {
-		return nil, errors.New("Cannot build flags from nil")
+		return errors.New("Cannot build flags from nil")
 	}
 
-	var parser = newparser()
-
-	err := recurseBuildFlags(flags, parser, "", reflect.ValueOf(configuration))
+	err := recurseBuildFlags(flags, "", reflect.ValueOf(configuration))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return parser, nil
+	return nil
 }
 
 // From populates the top-level default flags with hierarchical fields
 // from the given object.  It simply calls Into() with configuration
 // on a facade of the top-level flag package functions, and returns
 // the resultant Parser or error.
-func From(configuration interface{}) (*Parser, error) {
-	return Into(toplevelflags, configuration)
+func From(configuration interface{}) error {
+	return Into(flag.CommandLine, configuration)
 }
