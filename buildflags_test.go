@@ -124,7 +124,7 @@ func TestInto(t *testing.T) {
 			conf: map[string]int{"Banana": 7},
 			args: []string{"-Banana", "10"},
 			vars: map[string]expectedVariable{
-				"Banana": expectedVariable{value: 10},
+				"Banana": {value: 10},
 			},
 		},
 		{
@@ -132,8 +132,8 @@ func TestInto(t *testing.T) {
 			conf: map[string]interface{}{"MyStruct": &mystruct{}},
 			args: []string{"-MyStruct.FieldA", "asdf", "-MyStruct.FieldB", "12"},
 			vars: map[string]expectedVariable{
-				"MyStruct.FieldA": expectedVariable{value: "asdf", usage: "Field A"},
-				"MyStruct.FieldB": expectedVariable{value: 12},
+				"MyStruct.FieldA": {value: "asdf", usage: "Field A"},
+				"MyStruct.FieldB": {value: 12},
 			},
 		},
 		{
@@ -141,8 +141,8 @@ func TestInto(t *testing.T) {
 			conf: &mystruct{},
 			args: []string{"-FieldA", "foo", "-FieldB", "21"},
 			vars: map[string]expectedVariable{
-				"FieldA": expectedVariable{value: "foo", usage: "Field A"},
-				"FieldB": expectedVariable{value: 21},
+				"FieldA": {value: "foo", usage: "Field A"},
+				"FieldB": {value: 21},
 			},
 		},
 		{
@@ -150,11 +150,11 @@ func TestInto(t *testing.T) {
 			conf: &mystruct2{},
 			args: []string{"-Name", "foo", "-Index", "10", "-DoStuff", "-Location.Grid", "2048", "-Location.Fraction", "3.14"},
 			vars: map[string]expectedVariable{
-				"Name":              expectedVariable{value: "foo"},
-				"Index":             expectedVariable{value: 10},
-				"DoStuff":           expectedVariable{value: true},
-				"Location.Grid":     expectedVariable{value: uint64(2048)},
-				"Location.Fraction": expectedVariable{value: 3.14},
+				"Name":              {value: "foo"},
+				"Index":             {value: 10},
+				"DoStuff":           {value: true},
+				"Location.Grid":     {value: uint64(2048)},
+				"Location.Fraction": {value: 3.14},
 			},
 		},
 		{
@@ -162,10 +162,10 @@ func TestInto(t *testing.T) {
 			conf: &mystruct3{Location: &myotherstruct{}},
 			args: []string{"-Name", "bar", "-Index", "20", "-Location.Grid", "1000", "-Location.Fraction", "2.71"},
 			vars: map[string]expectedVariable{
-				"Name":              expectedVariable{value: "bar"},
-				"Index":             expectedVariable{value: 20},
-				"Location.Grid":     expectedVariable{value: uint64(1000)},
-				"Location.Fraction": expectedVariable{value: 2.71},
+				"Name":              {value: "bar"},
+				"Index":             {value: 20},
+				"Location.Grid":     {value: uint64(1000)},
+				"Location.Fraction": {value: 2.71},
 			},
 		},
 		{
@@ -173,9 +173,9 @@ func TestInto(t *testing.T) {
 			conf: &myotherstruct{Attrs: map[string]string{"Foo": "Bar"}},
 			args: []string{"-Grid", "12", "-Fraction", "1.23", "-Attrs.Foo", "AAA"},
 			vars: map[string]expectedVariable{
-				"Grid":      expectedVariable{value: uint64(12)},
-				"Fraction":  expectedVariable{value: 1.23},
-				"Attrs.Foo": expectedVariable{value: "AAA"},
+				"Grid":      {value: uint64(12)},
+				"Fraction":  {value: 1.23},
+				"Attrs.Foo": {value: "AAA"},
 			},
 		},
 		{
@@ -183,10 +183,10 @@ func TestInto(t *testing.T) {
 			conf: &mystruct3{},
 			args: []string{"-Index", "10", "-Location.Fraction", "3.14"},
 			vars: map[string]expectedVariable{
-				"Name":              expectedVariable{value: ""},
-				"Index":             expectedVariable{value: 10},
-				"Location.Grid":     expectedVariable{value: uint64(0)},
-				"Location.Fraction": expectedVariable{value: 3.14},
+				"Name":              {value: ""},
+				"Index":             {value: 10},
+				"Location.Grid":     {value: uint64(0)},
+				"Location.Fraction": {value: 3.14},
 			},
 		},
 		{
@@ -194,9 +194,9 @@ func TestInto(t *testing.T) {
 			conf: &mystruct4{},
 			args: []string{"-Temp", "-10", "-Check", "5", "-Files", "foo.log", "-Files", "bar.txt"},
 			vars: map[string]expectedVariable{
-				"Temp":  expectedVariable{value: int64(-10)},
-				"Check": expectedVariable{value: uint(5)},
-				"Files": expectedVariable{value: []string{"foo.log", "bar.txt"}},
+				"Temp":  {value: int64(-10)},
+				"Check": {value: uint(5)},
+				"Files": {value: []string{"foo.log", "bar.txt"}},
 			},
 		},
 		{
@@ -204,7 +204,7 @@ func TestInto(t *testing.T) {
 			conf: &mystruct5{},
 			args: []string{"-Getter", "Foo"},
 			vars: map[string]expectedVariable{
-				"Getter": expectedVariable{value: "Foo"},
+				"Getter": {value: "Foo"},
 			},
 		},
 	}

@@ -69,11 +69,7 @@ func Parse(in io.Reader, flagSet *flag.FlagSet) error {
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	return nil
+	return scanner.Err()
 }
 
 // ParseFile reads the file indicated by filename line by line and parses
