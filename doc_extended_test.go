@@ -25,7 +25,6 @@ type barcomponent struct {
 }
 
 func Example_extended() {
-
 	// Create some sample data
 	masterconf := make(map[string]interface{})
 
@@ -67,7 +66,6 @@ func Example_extended() {
 	// Output our data
 	fmt.Println(masterconf["Foo"].(*foocomponent).Port)
 	fmt.Println(masterconf["Bar"].(*barcomponent).Nested.Index)
-
 	// Output:
 	// 1234
 	// 7.9

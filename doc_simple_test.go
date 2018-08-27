@@ -11,7 +11,6 @@ type server struct {
 }
 
 func Example_simple() {
-
 	myserver := &server{}
 
 	// Construct the flags
@@ -21,6 +20,5 @@ func Example_simple() {
 
 	// Read from the command line to establish the param
 	flag.Parse()
-
 	// Output:
 }
