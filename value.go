@@ -25,7 +25,12 @@ func (v value) Set(s string) error {
 
 func (v value) Get() interface{} { return v.kind.Get(v.value) }
 
-func (v value) String() string { return v.kind.String(v.value) }
+func (v value) String() string {
+	if v.kind == nil || !v.value.IsValid() {
+		return ""
+	}
+	return v.kind.String(v.value)
+}
 
 func (v value) IsBoolFlag() bool { return v.isBool }
 

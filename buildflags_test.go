@@ -1,6 +1,7 @@
 package goflagbuilder
 
 import (
+	"bytes"
 	"flag"
 	"testing"
 
@@ -43,6 +44,17 @@ type mystruct4 struct {
 
 type mystruct5 struct {
 	Getter testGetter
+}
+
+type configStruct struct {
+	A struct {
+		Name  string `help:"Name"`
+		Value string `help:"Value"`
+	}
+	B struct {
+		Foo int64
+		Bar uint
+	}
 }
 
 type testGetter struct {
@@ -112,6 +124,7 @@ func TestInto(t *testing.T) {
 		conf interface{}
 		args []string
 		vars map[string]expectedVariable
+		help string
 	}{
 		{
 			name: "Empty map",
@@ -126,6 +139,7 @@ func TestInto(t *testing.T) {
 			vars: map[string]expectedVariable{
 				"Banana": {value: 10},
 			},
+			help: "  -Banana\n    \t (default 7)\n",
 		},
 		{
 			name: "Map to Struct Ptr",
@@ -135,6 +149,7 @@ func TestInto(t *testing.T) {
 				"MyStruct.FieldA": {value: "asdf", usage: "Field A"},
 				"MyStruct.FieldB": {value: 12},
 			},
+			help: "  -MyStruct.FieldA\n    \tField A\n  -MyStruct.FieldB\n    \t (default 0)\n",
 		},
 		{
 			name: "Struct Ptr",
@@ -144,6 +159,7 @@ func TestInto(t *testing.T) {
 				"FieldA": {value: "foo", usage: "Field A"},
 				"FieldB": {value: 21},
 			},
+			help: "  -FieldA\n    \tField A\n  -FieldB\n    \t (default 0)\n",
 		},
 		{
 			name: "Nested Struct",
@@ -156,6 +172,7 @@ func TestInto(t *testing.T) {
 				"Location.Grid":     {value: uint64(2048)},
 				"Location.Fraction": {value: 3.14},
 			},
+			help: "  -DoStuff\n    \t (default false)\n  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
 			name: "Nested Struct Ptr",
@@ -167,6 +184,7 @@ func TestInto(t *testing.T) {
 				"Location.Grid":     {value: uint64(1000)},
 				"Location.Fraction": {value: 2.71},
 			},
+			help: "  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
 			name: "Struct with Nested Map",
@@ -177,6 +195,7 @@ func TestInto(t *testing.T) {
 				"Fraction":  {value: 1.23},
 				"Attrs.Foo": {value: "AAA"},
 			},
+			help: "  -Attrs.Foo\n    \t (default Bar)\n  -Fraction\n    \t (default 0)\n  -Grid\n    \t (default 0)\n",
 		},
 		{
 			name: "Struct with nil Pointer",
@@ -188,6 +207,7 @@ func TestInto(t *testing.T) {
 				"Location.Grid":     {value: uint64(0)},
 				"Location.Fraction": {value: 3.14},
 			},
+			help: "  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
 			name: "Struct with Slice",
@@ -198,6 +218,7 @@ func TestInto(t *testing.T) {
 				"Check": {value: uint(5)},
 				"Files": {value: []string{"foo.log", "bar.txt"}},
 			},
+			help: "  -Check\n    \t (default 0)\n  -Files\n    \t (default [])\n  -Temp\n    \t (default 0)\n",
 		},
 		{
 			name: "Struct with Getter",
@@ -206,6 +227,19 @@ func TestInto(t *testing.T) {
 			vars: map[string]expectedVariable{
 				"Getter": {value: "Foo"},
 			},
+			help: "  -Getter\n    \t\n",
+		},
+		{
+			name: "Struct with nested anoymous structs",
+			conf: &configStruct{},
+			args: []string{"-A.Name", "asdf"},
+			vars: map[string]expectedVariable{
+				"A.Name":  {value: "asdf", usage: "Name"},
+				"A.Value": {value: "", usage: "Value"},
+				"B.Foo":   {value: int64(0)},
+				"B.Bar":   {value: uint(0)},
+			},
+			help: "  -A.Name\n    \tName\n  -A.Value\n    \tValue\n  -B.Bar\n    \t (default 0)\n  -B.Foo\n    \t (default 0)\n",
 		},
 	}
 
@@ -249,6 +283,13 @@ func TestInto(t *testing.T) {
 
 				assert.Equal(t, expected.value, getter.Get(), "Values for %s not equal", name)
 			}
+
+			var buf bytes.Buffer
+
+			flagSet.SetOutput(&buf)
+			flagSet.PrintDefaults()
+
+			assert.Equal(t, item.help, buf.String())
 		})
 	}
 }
