@@ -70,7 +70,8 @@ structures are valid.
 
 ## Changelog
 
- * **2018/08/16: v2.0.1** Remove mistakenly included logging, and formatting.
+ * **2018/10/03: v2.0.2** Fix crash when printing values.
+ * **2018/10/03: v2.0.1** Remove mistakenly included logging, and formatting.
  * **2018/08/16: v2.0.0** Simplified package a bit, split config file
    parsing to its own sub-package. Added a new sub-package to read
    environment variables.
