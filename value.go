@@ -2,7 +2,6 @@ package goflagbuilder
 
 import (
 	"flag"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -73,10 +72,6 @@ func findKind(r reflect.Value) flagKind {
 			return kind
 		}
 	}
-
-	log.Println("Type:", r.Type())
-	log.Println("Getter:", reflect.TypeOf((*flag.Getter)(nil)).Elem())
-	log.Println("Implements:", reflect.PtrTo(r.Type()).Implements(reflect.TypeOf((*flag.Getter)(nil)).Elem()))
 
 	if isGetter(r) || (r.CanAddr() && isGetter(r.Addr())) {
 		return getterKind{}
