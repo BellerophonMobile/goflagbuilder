@@ -68,12 +68,13 @@ There are also a series of tests in the package outlining exactly what input
 structures are valid.
 
 
-## Major Release Changelog
+## Changelog
 
- * **2018/08/16: Release 2.0!** Simplified package a bit, split config file
+ * **2018/08/16: v2.0.1** Remove mistakenly included logging, and formatting.
+ * **2018/08/16: v2.0.0** Simplified package a bit, split config file
    parsing to its own sub-package. Added a new sub-package to read
    environment variables.
- * **2014/11/03: Release 1.0!** Though not mature at all, we consider
+ * **2014/11/03: v1.0.0** Though not mature at all, we consider
    GoFlagBuilder to be usable.
 
 ## License
