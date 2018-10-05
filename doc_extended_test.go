@@ -52,12 +52,12 @@ func Example_extended() {
 		Bar.Nested.Index=7.9 # SuccesS!
 	`)
 	if err := conf.Parse(reader, nil); err != nil {
-		log.Fatal("Error:", err)
+		log.Fatal("error:", err)
 	}
 
 	// Override settings from the environment
 	if err := env.Parse(nil); err != nil {
-		log.Fatal("Error:", err)
+		log.Fatal("error:", err)
 	}
 
 	// Override settings from the command line

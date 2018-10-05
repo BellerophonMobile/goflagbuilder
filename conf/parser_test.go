@@ -36,7 +36,7 @@ func TestParseValid(t *testing.T) {
 		end   map[string]interface{}
 	}{
 		{
-			name:  "Parse Empty Doc",
+			name:  "parse empty doc",
 			input: "",
 			start: map[string]interface{}{
 				"FieldA": "Banana",
@@ -48,7 +48,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name:  "Parse Comment",
+			name:  "parse comment",
 			input: "# Mushi sushi",
 			start: map[string]interface{}{
 				"FieldA": "Banana",
@@ -60,7 +60,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name:  "Parse First Line",
+			name:  "parse first line",
 			input: "FieldA=sushi",
 			start: map[string]interface{}{
 				"FieldA": "Banana",
@@ -72,7 +72,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines",
+			name: "parse two lines",
 			input: `FieldA=sushi
 			        FieldB=9`,
 			start: map[string]interface{}{
@@ -85,7 +85,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines Preceded by Comment",
+			name: "parse two lines preceded by comment",
 			input: `# This is a comment
 			        FieldA=sushi
 			        FieldB=9`,
@@ -99,7 +99,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines Trailed by Comment",
+			name: "parse two lines trailed by comment",
 			input: `FieldA=sushi
 			        FieldB=9
 			        # This is a comment`,
@@ -113,7 +113,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines Split by Comment",
+			name: "parse two lines split by comment",
 			input: `FieldA=sushi
 			        # This is a comment
 			        FieldB=9`,
@@ -127,7 +127,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines Split by Comment and Blank Line",
+			name: "parse two lines split by comment and blank line",
 			input: `FieldA=sushi
 
 			        # This is a comment
@@ -142,7 +142,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Two Lines With Comments and Blank Lines",
+			name: "parse two lines with comments and blank lines",
 			input: `FieldA=sushi
 
 			        # This is a comment
@@ -158,7 +158,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name:  "Parse Comment on Line",
+			name:  "parse comment on line",
 			input: "FieldA=sushi # Banananana",
 			start: map[string]interface{}{
 				"FieldA": "Banana",
@@ -180,14 +180,14 @@ func TestParseValid(t *testing.T) {
 			flag.CommandLine = flagSet
 
 			if err := Parse(reader, nil); err != nil {
-				t.Error("Unexpected error:", err)
+				t.Error("unexpected error:", err)
 			}
 
 			for k, v := range item.end {
 				f := flagSet.Lookup(k)
 				getter := f.Value.(flag.Getter)
 				if v != getter.Get() {
-					t.Errorf("Values not equal\nExpected: %v\n  Actual: %v", v, getter.Get())
+					t.Errorf("values not equal\nexpected: %v\n  actual: %v", v, getter.Get())
 				}
 			}
 		})
@@ -202,7 +202,7 @@ func TestParseInvalid(t *testing.T) {
 		err   string
 	}{
 		{
-			name:  "Parse No Key",
+			name:  "parse no key",
 			input: "Sushi",
 			err:   "line 1 has no key",
 			start: map[string]interface{}{
@@ -211,7 +211,7 @@ func TestParseInvalid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse No Key Line 2",
+			name: "parse no key line 2",
 			input: `# Line 1
 			        sushi`,
 			err: "line 2 has no key",
@@ -221,7 +221,7 @@ func TestParseInvalid(t *testing.T) {
 			},
 		},
 		{
-			name:  "Parse Unknown Key",
+			name:  "parse unknown key",
 			input: "Foo=10",
 			err:   "unknown key 'Foo' on line 1",
 			start: map[string]interface{}{
@@ -238,9 +238,9 @@ func TestParseInvalid(t *testing.T) {
 
 			err := Parse(reader, flagSet)
 			if err == nil {
-				t.Error("Expected error:", item.err)
+				t.Error("expected error:", item.err)
 			} else if item.err != err.Error() {
-				t.Errorf("Errors don't match\nExpected: %s\n  Actual: %s", item.err, err.Error())
+				t.Errorf("errors don't match\nexpected: %s\n  actual: %s", item.err, err.Error())
 			}
 		})
 	}
@@ -256,10 +256,10 @@ func TestParseBadReader(t *testing.T) {
 	err := Parse(badreader{}, flagSet)
 
 	if err == nil {
-		t.Error("Expected read error")
+		t.Error("expected read error")
 	} else {
 		if err.Error() != "test" {
-			t.Error("Unexpected error:", err.Error())
+			t.Error("unexpected error:", err.Error())
 		}
 	}
 }
@@ -278,10 +278,10 @@ func TestParseBadValue(t *testing.T) {
 	err := Parse(reader, flagSet)
 
 	if err == nil {
-		t.Error("Expected set error")
+		t.Error("expected set error")
 	} else {
 		if err.Error() != "test" {
-			t.Error("Unexpected error:", err.Error())
+			t.Error("unexpected error:", err.Error())
 		}
 	}
 }
@@ -289,18 +289,18 @@ func TestParseBadValue(t *testing.T) {
 func TestParseFile(t *testing.T) {
 	tmpFile, err := ioutil.TempFile("", "goflagbuilder-test")
 	if err != nil {
-		t.Fatal("Failed to create temp file:", err)
+		t.Fatal("failed to create temp file:", err)
 		return
 	}
 
 	defer os.Remove(tmpFile.Name())
 
 	if _, err := tmpFile.WriteString("Foo=10"); err != nil {
-		t.Fatal("Failed to write temp file:", err)
+		t.Fatal("failed to write temp file:", err)
 		return
 	}
 	if err := tmpFile.Sync(); err != nil {
-		t.Fatal("Failed to sync temp file:", err)
+		t.Fatal("failed to sync temp file:", err)
 		return
 	}
 
@@ -308,11 +308,11 @@ func TestParseFile(t *testing.T) {
 	foo := flagSet.Int("Foo", 5, "")
 
 	if err := ParseFile(tmpFile.Name(), flagSet); err != nil {
-		t.Error("Failed to parse file:", err)
+		t.Error("failed to parse file:", err)
 	}
 
 	if *foo != 10 {
-		t.Error("Failed to set value")
+		t.Error("failed to set value")
 	}
 }
 
@@ -325,10 +325,10 @@ func TestParseFileBad(t *testing.T) {
 	err := ParseFile("/goflagbuilder-bad-test", nil)
 
 	if err == nil {
-		t.Error("Expected parse error")
+		t.Error("expected parse error")
 	} else {
 		if err.Error() != "open /goflagbuilder-bad-test: no such file or directory" {
-			t.Error("Unexpected error:", err.Error())
+			t.Error("unexpected error:", err.Error())
 		}
 	}
 }

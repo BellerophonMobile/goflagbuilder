@@ -14,7 +14,7 @@ func populateMapFlags(flags FlagSet, prefix string, mapval reflect.Value) error 
 
 	for _, keyval := range mapval.MapKeys() {
 		if keyval.Kind() != reflect.String {
-			return fmt.Errorf("Map key must be string, got %s for prefix '%s'", keyval.Type(), prefix)
+			return fmt.Errorf("map key must be string, got %s for prefix '%s'", keyval.Type(), prefix)
 		}
 
 		subprefix := prefix + keyval.String()
@@ -49,6 +49,31 @@ func populateStructFlags(flags FlagSet, prefix string, structval reflect.Value) 
 	structtype := structval.Type()
 	for i := 0; i < structval.NumField(); i++ {
 		field := structtype.Field(i)
+
+		// This is true if the field is unexported.  Borrowed from JSON encoder.
+		if field.PkgPath != "" {
+			continue
+		}
+
+		// This is borrowed from stdlib's JSON encoder
+		// https://golang.org/src/encoding/json/encode.go#L1102
+		isUnexported := field.PkgPath != ""
+		if field.Anonymous {
+			t := field.Type
+			if t.Kind() == reflect.Ptr {
+				t = t.Elem()
+			}
+			if isUnexported && t.Kind() != reflect.Struct {
+				// Ignore embedded fields of unexported non-struct types.
+				continue
+			}
+			// Do not ignore embedded fields of unexported struct types
+			// since they may have exported fields.
+		} else if isUnexported {
+			// Ignore unexported non-embedded fields.
+			continue
+		}
+
 		elementval := structval.Field(i)
 		subprefix := prefix + field.Name
 		help := field.Tag.Get("help")
@@ -61,7 +86,7 @@ func populateStructFlags(flags FlagSet, prefix string, structval reflect.Value) 
 
 		if value.kind != nil {
 			if !elementval.CanSet() {
-				return fmt.Errorf("Value of type %s at %s cannot be set", field.Type.String(), subprefix)
+				return fmt.Errorf("value of type %s at %s cannot be set", field.Type.String(), subprefix)
 			}
 			flags.Var(value, subprefix, help)
 
@@ -78,7 +103,7 @@ func recursePtrFlags(flags FlagSet, prefix string, ptrval reflect.Value) error {
 		if ptrval.CanSet() {
 			ptrval.Set(reflect.New(ptrval.Type().Elem()))
 		} else {
-			return fmt.Errorf("Cannot build flags from nil pointer for prefix '%s'", prefix)
+			return fmt.Errorf("cannot build flags from nil pointer for prefix '%s'", prefix)
 		}
 	}
 
@@ -97,7 +122,7 @@ func recurseBuildFlags(flags FlagSet, prefix string, elementval reflect.Value) e
 		return recursePtrFlags(flags, prefix, elementval)
 
 	default:
-		return fmt.Errorf("Cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
+		return fmt.Errorf("cannot build flags from type %v for prefix '%s'", elementval.Type(), prefix)
 	}
 }
 
@@ -106,7 +131,7 @@ func recurseBuildFlags(flags FlagSet, prefix string, elementval reflect.Value) e
 // same flags from a configuration file.
 func Into(flags FlagSet, configuration interface{}) error {
 	if configuration == nil {
-		return errors.New("Cannot build flags from nil")
+		return errors.New("cannot build flags from nil")
 	}
 
 	err := recurseBuildFlags(flags, "", reflect.ValueOf(configuration))

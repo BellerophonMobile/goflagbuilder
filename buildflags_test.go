@@ -75,24 +75,24 @@ func TestInto_Invalid(t *testing.T) {
 		conf interface{}
 		err  string
 	}{
-		{"Nil", nil, "Cannot build flags from nil"},
-		{"String", "Banana", "Cannot build flags from type string for prefix ''"},
-		{"Int", 7, "Cannot build flags from type int for prefix ''"},
-		{"Float", 7.0, "Cannot build flags from type float64 for prefix ''"},
+		{"nil", nil, "cannot build flags from nil"},
+		{"string", "Banana", "cannot build flags from type string for prefix ''"},
+		{"int", 7, "cannot build flags from type int for prefix ''"},
+		{"float", 7.0, "cannot build flags from type float64 for prefix ''"},
 		{
-			name: "Struct",
+			name: "struct",
 			conf: mystruct{"Banana", 7},
-			err:  "Value of type string at FieldA cannot be set",
+			err:  "value of type string at FieldA cannot be set",
 		},
 		{
-			name: "Map to Struct",
+			name: "map to struct",
 			conf: map[string]interface{}{"MyStruct": mystruct{"Banana", 7}},
-			err:  "Value of type string at MyStruct.FieldA cannot be set",
+			err:  "value of type string at MyStruct.FieldA cannot be set",
 		},
 		{
-			name: "Map without string keys",
+			name: "map without string keys",
 			conf: map[int]interface{}{10: mystruct{"Banana", 7}},
-			err:  "Map key must be string, got int for prefix ''",
+			err:  "map key must be string, got int for prefix ''",
 		},
 	}
 
@@ -102,11 +102,11 @@ func TestInto_Invalid(t *testing.T) {
 			err := Into(flagSet, item.conf)
 
 			if err == nil {
-				t.Error("Did not get expected error:", item.err)
+				t.Error("did not get expected error:", item.err)
 			} else {
 				actualError := err.Error()
 				if item.err != actualError {
-					t.Errorf("Expected error did not match actual.\nExpected: %s\n  Actual: %s", item.err, actualError)
+					t.Errorf("expected error did not match actual.\nExpected: %s\n  Actual: %s", item.err, actualError)
 				}
 			}
 		})
@@ -127,13 +127,13 @@ func TestInto(t *testing.T) {
 		help string
 	}{
 		{
-			name: "Empty map",
+			name: "empty map",
 			conf: map[string]int{},
 			args: []string{},
 			vars: map[string]expectedVariable{},
 		},
 		{
-			name: "Map to Int",
+			name: "map to int",
 			conf: map[string]int{"Banana": 7},
 			args: []string{"-Banana", "10"},
 			vars: map[string]expectedVariable{
@@ -142,7 +142,7 @@ func TestInto(t *testing.T) {
 			help: "  -Banana\n    \t (default 7)\n",
 		},
 		{
-			name: "Map to Struct Ptr",
+			name: "map to struct ptr",
 			conf: map[string]interface{}{"MyStruct": &mystruct{}},
 			args: []string{"-MyStruct.FieldA", "asdf", "-MyStruct.FieldB", "12"},
 			vars: map[string]expectedVariable{
@@ -152,7 +152,7 @@ func TestInto(t *testing.T) {
 			help: "  -MyStruct.FieldA\n    \tField A\n  -MyStruct.FieldB\n    \t (default 0)\n",
 		},
 		{
-			name: "Struct Ptr",
+			name: "struct ptr",
 			conf: &mystruct{},
 			args: []string{"-FieldA", "foo", "-FieldB", "21"},
 			vars: map[string]expectedVariable{
@@ -162,7 +162,7 @@ func TestInto(t *testing.T) {
 			help: "  -FieldA\n    \tField A\n  -FieldB\n    \t (default 0)\n",
 		},
 		{
-			name: "Nested Struct",
+			name: "nested struct",
 			conf: &mystruct2{},
 			args: []string{"-Name", "foo", "-Index", "10", "-DoStuff", "-Location.Grid", "2048", "-Location.Fraction", "3.14"},
 			vars: map[string]expectedVariable{
@@ -175,7 +175,7 @@ func TestInto(t *testing.T) {
 			help: "  -DoStuff\n    \t (default false)\n  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
-			name: "Nested Struct Ptr",
+			name: "nested struct ptr",
 			conf: &mystruct3{Location: &myotherstruct{}},
 			args: []string{"-Name", "bar", "-Index", "20", "-Location.Grid", "1000", "-Location.Fraction", "2.71"},
 			vars: map[string]expectedVariable{
@@ -187,7 +187,7 @@ func TestInto(t *testing.T) {
 			help: "  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
-			name: "Struct with Nested Map",
+			name: "struct with nested map",
 			conf: &myotherstruct{Attrs: map[string]string{"Foo": "Bar"}},
 			args: []string{"-Grid", "12", "-Fraction", "1.23", "-Attrs.Foo", "AAA"},
 			vars: map[string]expectedVariable{
@@ -198,7 +198,7 @@ func TestInto(t *testing.T) {
 			help: "  -Attrs.Foo\n    \t (default Bar)\n  -Fraction\n    \t (default 0)\n  -Grid\n    \t (default 0)\n",
 		},
 		{
-			name: "Struct with nil Pointer",
+			name: "struct with nil pointer",
 			conf: &mystruct3{},
 			args: []string{"-Index", "10", "-Location.Fraction", "3.14"},
 			vars: map[string]expectedVariable{
@@ -210,7 +210,7 @@ func TestInto(t *testing.T) {
 			help: "  -Index\n    \t (default 0)\n  -Location.Fraction\n    \t (default 0)\n  -Location.Grid\n    \t (default 0)\n  -Name\n    \t\n",
 		},
 		{
-			name: "Struct with Slice",
+			name: "struct with slice",
 			conf: &mystruct4{},
 			args: []string{"-Temp", "-10", "-Check", "5", "-Files", "foo.log", "-Files", "bar.txt"},
 			vars: map[string]expectedVariable{
@@ -221,7 +221,7 @@ func TestInto(t *testing.T) {
 			help: "  -Check\n    \t (default 0)\n  -Files\n    \t (default [])\n  -Temp\n    \t (default 0)\n",
 		},
 		{
-			name: "Struct with Getter",
+			name: "struct with getter",
 			conf: &mystruct5{},
 			args: []string{"-Getter", "Foo"},
 			vars: map[string]expectedVariable{
@@ -230,7 +230,7 @@ func TestInto(t *testing.T) {
 			help: "  -Getter\n    \t\n",
 		},
 		{
-			name: "Struct with nested anoymous structs",
+			name: "struct with nested anoymous structs",
 			conf: &configStruct{},
 			args: []string{"-A.Name", "asdf"},
 			vars: map[string]expectedVariable{
@@ -248,12 +248,12 @@ func TestInto(t *testing.T) {
 			flagSet := flag.NewFlagSet(item.name, flag.ContinueOnError)
 
 			if err := Into(flagSet, item.conf); err != nil {
-				t.Error("Unexpected error:", err)
+				t.Error("unexpected error:", err)
 				return
 			}
 
 			if err := flagSet.Parse(item.args); err != nil {
-				t.Error("Error parsing args:", err)
+				t.Error("error parsing args:", err)
 				return
 			}
 
@@ -261,27 +261,27 @@ func TestInto(t *testing.T) {
 				if _, ok := item.vars[f.Name]; ok {
 					return
 				}
-				t.Error("Unexpected variable:", f.Name)
+				t.Error("unexpected variable:", f.Name)
 			})
 
 			for name, expected := range item.vars {
 				f := flagSet.Lookup(name)
 				if f == nil {
-					t.Error("Expected variable was not found:", name)
+					t.Error("expected variable was not found:", name)
 					return
 				}
 
 				if expected.usage != f.Usage {
-					t.Errorf("Usage doesn't match\nExpected: %s\n  Actual: %s", expected.usage, f.Usage)
+					t.Errorf("usage doesn't match\nexpected: %s\n  actual: %s", expected.usage, f.Usage)
 				}
 
 				getter, ok := f.Value.(flag.Getter)
 				if !ok {
-					t.Fatal("Value not getter?")
+					t.Fatal("value not getter?")
 					return
 				}
 
-				assert.Equal(t, expected.value, getter.Get(), "Values for %s not equal", name)
+				assert.Equal(t, expected.value, getter.Get(), "values for %s not equal", name)
 			}
 
 			var buf bytes.Buffer

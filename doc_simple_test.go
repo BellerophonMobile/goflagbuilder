@@ -15,7 +15,7 @@ func Example_simple() {
 
 	// Construct the flags
 	if err := From(myserver); err != nil {
-		log.Fatal("Error: " + err.Error())
+		log.Fatal("error: " + err.Error())
 	}
 
 	// Read from the command line to establish the param

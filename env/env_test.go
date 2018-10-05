@@ -34,7 +34,7 @@ func TestParseValid(t *testing.T) {
 		end   map[string]interface{}
 	}{
 		{
-			name: "Parse Empty Env",
+			name: "parse empty env",
 			env:  map[string]string{},
 			start: map[string]interface{}{
 				"FieldA": "Banana",
@@ -46,7 +46,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Single Value",
+			name: "parse single value",
 			env: map[string]string{
 				"PARSE_SINGLE_VALUE_FIELDB": "10",
 			},
@@ -60,7 +60,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Multiple Values",
+			name: "parse multiple values",
 			env: map[string]string{
 				"PARSE_MULTIPLE_VALUES_FIELDA": "Sushi",
 				"PARSE_MULTIPLE_VALUES_FIELDB": "20",
@@ -75,7 +75,7 @@ func TestParseValid(t *testing.T) {
 			},
 		},
 		{
-			name: "Parse Extraneous Values",
+			name: "parse extraneous values",
 			env: map[string]string{
 				"PARSE_EXTRANEOUS_VALUES_FIELDA": "Sushi",
 				"PARSE_EXTRANEOUS_VALUES_FIELDB": "20",
@@ -105,14 +105,14 @@ func TestParseValid(t *testing.T) {
 			flag.CommandLine = flagSet
 
 			if err := Parse(nil); err != nil {
-				t.Error("Unexpected error:", err)
+				t.Error("unexpected error:", err)
 			}
 
 			for k, v := range item.end {
 				f := flagSet.Lookup(k)
 				getter := f.Value.(flag.Getter)
 				if v != getter.Get() {
-					t.Errorf("Values not equal\nExpected: %v\n  Actual: %v", v, getter.Get())
+					t.Errorf("values not equal\nExpected: %v\n  Actual: %v", v, getter.Get())
 				}
 			}
 		})
@@ -136,10 +136,10 @@ func TestParseBadValue(t *testing.T) {
 	err := Parse(flagSet)
 
 	if err == nil {
-		t.Error("Expected set error")
+		t.Error("expected set error")
 	} else {
 		if err.Error() != "test" {
-			t.Error("Unexpected error:", err.Error())
+			t.Error("unexpected error:", err.Error())
 		}
 	}
 }
