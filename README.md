@@ -70,6 +70,8 @@ structures are valid.
 
 ## Changelog
 
+ * **2018/10/15: v2.1.0** Clean up path from FlagSet name for environment
+                          variable parsing.
  * **2018/10/03: v2.0.3** Ignore unexported fields of structs.
  * **2018/10/03: v2.0.2** Fix crash when printing values.
  * **2018/10/03: v2.0.1** Remove mistakenly included logging, and formatting.
