@@ -91,6 +91,57 @@ func TestParseValid(t *testing.T) {
 				"FieldB": 20,
 			},
 		},
+		{
+			name: "./parse/file/names/test",
+			env: map[string]string{
+				"TEST_FIELDA": "Sushi",
+				"TEST_FIELDB": "20",
+				"HELLO":       "3.14",
+				"FOO_BAR":     "AAA",
+			},
+			start: map[string]interface{}{
+				"FieldA": "Banana",
+				"FieldB": 7,
+			},
+			end: map[string]interface{}{
+				"FieldA": "Sushi",
+				"FieldB": 20,
+			},
+		},
+		{
+			name: "/another/file/names/test",
+			env: map[string]string{
+				"TEST_FIELDA": "Sushi",
+				"TEST_FIELDB": "20",
+				"HELLO":       "3.14",
+				"FOO_BAR":     "AAA",
+			},
+			start: map[string]interface{}{
+				"FieldA": "Banana",
+				"FieldB": 7,
+			},
+			end: map[string]interface{}{
+				"FieldA": "Sushi",
+				"FieldB": 20,
+			},
+		},
+		{
+			name: "/file/names/test/",
+			env: map[string]string{
+				"TEST_FIELDA": "Sushi",
+				"TEST_FIELDB": "20",
+				"HELLO":       "3.14",
+				"FOO_BAR":     "AAA",
+			},
+			start: map[string]interface{}{
+				"FieldA": "Banana",
+				"FieldB": 7,
+			},
+			end: map[string]interface{}{
+				"FieldA": "Sushi",
+				"FieldB": 20,
+			},
+		},
 	}
 
 	for _, item := range suite {

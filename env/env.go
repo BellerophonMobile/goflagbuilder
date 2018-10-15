@@ -9,7 +9,7 @@ Environment variables are of the format:
 
 Where FSNAME is the name of the given flag.FlagSet. KEYNAME is the name of
 the flag. All spaces and periods are replaced with underscores in both
-strings.
+strings. The name of the FlagSet is cleaned with path.Base().
 
 */
 package env
@@ -17,6 +17,7 @@ package env
 import (
 	"flag"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -29,7 +30,7 @@ func Parse(flagSet *flag.FlagSet) error {
 		flagSet = flag.CommandLine
 	}
 
-	name := format(flagSet.Name())
+	name := format(path.Base(flagSet.Name()))
 	if name != "" {
 		name += "_"
 	}
